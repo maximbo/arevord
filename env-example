@@ -1,0 +1,2 @@
+DB_DSN=db.sqlite
+REDIS_DSN=redis://127.0.0.1:6379/0

@@ -1,0 +1,32 @@
+{
+  "type": "module",
+  "scripts": {
+    "parser": "bun ./dist/main.js parser",
+    "storer": "bun ./dist/main.js storer",
+    "fetcher": "bun ./dist/main.js fetcher",
+    "all": "bun ./dist/main.js all",
+    "purge-queues": "bun ./dist/main.js purge-queues",
+    "migrate": "bun drizzle-kit migrate",
+    "build": "bun run build.ts"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "axios": "^1.10.0",
+    "better-sqlite3": "^12.2.0",
+    "commander": "^14.0.0",
+    "dotenv": "^17.0.0",
+    "drizzle-kit": "^0.31.4",
+    "drizzle-orm": "^0.44.2",
+    "ioredis": "^5.6.1",
+    "jsdom": "^26.1.0",
+    "pino": "^9.7.0",
+    "string-strip-html": "^13.4.12"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.17",
+    "@types/commander": "^2.12.5",
+    "@types/jsdom": "^21.1.7",
+    "@types/mozilla-readability": "^0.2.1",
+    "vitest": "^3.2.4"
+  }
+}
