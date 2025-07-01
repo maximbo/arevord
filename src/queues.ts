@@ -1,8 +1,5 @@
-import {
-  ArticleParsingJob,
-  ArticleProcessingStatus,
-} from "./types";
-import { redisConnection } from "./redis";
+import { ArticleParsingJob, ArticleProcessingStatus } from "./types";
+import { redisConnection, redisConnection } from "./redis";
 import logger from "./logger";
 
 export const ARTICLES_PARSER_QUEUE = "articles.parse";
@@ -21,14 +18,15 @@ export const Serializer = {
 };
 
 export const enqueueArticleParsing = async (data: ArticleParsingJob) =>
-  enqueue(ARTICLES_PARSER_QUEUE, data);
+  await enqueue(ARTICLES_PARSER_QUEUE, data);
 
-export const enqueueParsedArticleStore = async (data: ArticleProcessingStatus) =>
-  enqueue(ARTICLES_STORE_QUEUE, data);
+export const enqueueParsedArticleStore = async (
+  data: ArticleProcessingStatus,
+) => await enqueue(ARTICLES_STORE_QUEUE, data);
 
-export const enqueueArticleProcessingStatus = async (data: ArticleProcessingStatus) =>
-  enqueue(ARTICLES_PROCESSING_STATUS_QUEUE, data);
-
+export const enqueueArticleProcessingStatus = async (
+  data: ArticleProcessingStatus,
+) => await enqueue(ARTICLES_PROCESSING_STATUS_QUEUE, data);
 
 export const purgeAllQueues = async () => {
   await Promise.all(QUEUES.map((stream) => purgeStream(stream)));
@@ -64,19 +62,21 @@ export const createConsumer = async (
   consumerName: string,
   handler: (data: any, messageId: string) => Promise<void>,
   abortSignal?: AbortSignal,
+  timeout: number = 0,
 ) => {
   const shouldContinue = () => !abortSignal || !abortSignal.aborted;
+  const redis = redisConnection.duplicate();
 
   while (shouldContinue()) {
     try {
-      const result = await redisConnection.xreadgroup(
+      const result = await redis.xreadgroup(
         "GROUP",
         "workers",
         consumerName,
         "COUNT",
         "1",
         "BLOCK",
-        "300",
+        timeout,
         "STREAMS",
         streamName,
         ">",

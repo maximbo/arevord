@@ -11,17 +11,20 @@ import { articlesTable } from "./db/schema";
 import logger from "./logger";
 import { ArticleProcessingStatus } from "./types";
 
-async function storeArticle(article: ArticleProcessingStatus, messageId: string) {
+async function storeArticle(
+  article: ArticleProcessingStatus,
+  messageId: string,
+) {
+  await enqueueArticleProcessingStatus(article);
+
   try {
-    logger.info(`Storing parsed article ${article.url}`);
+    logger.info(`Storing article data ${article.url}`);
     await db.insert(articlesTable).values(article);
     await ackMessage(ARTICLES_STORE_QUEUE, messageId);
   } catch (err) {
     logger.error(`Cannot store article ${article.url}: ${err}`);
     throw err;
   }
-
-  await enqueueArticleProcessingStatus(article);
 }
 
 export async function runStorer() {
